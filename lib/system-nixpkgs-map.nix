@@ -95,6 +95,7 @@ in
   # compile C sources (https://github.com/fpco/odbc/blob/master/cbits/odbc.c)
   odbc = [ unixODBC ];
   opencv = [ opencv3 ];
+  ical = [ libical ];
   icuuc = [ icu ];
   icui18n = [ icu ];
   icu-i18n = [ icu ];
@@ -114,6 +115,7 @@ in
   GeoIP = [ geoip ];
   pulse-simple = [ libpulseaudio ];
   oath = [ liboauth ];
+  mcrypt = [ libmcrypt ];
 }
 # -- windows
 // { advapi32 = null; gdi32 = null; imm32 = null; msimg32 = null;

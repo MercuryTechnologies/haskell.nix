@@ -65,6 +65,7 @@ pkgs:
     "gtksourceview-3.0"                  = [ pkgs."gtksourceview3" ];
     "harfbuzz-gobject"                   = [ pkgs."harfbuzz" ];
     "hidapi-libusb"                      = [ pkgs."hidapi" ];
+    "ical"                               = [ pkgs."libical" ];
     "icudata"                            = [ pkgs."icu" ];
     "icui18n"                            = [ pkgs."icu" ];
     "icu-i18n"                           = [ pkgs."icu" ];
@@ -105,6 +106,7 @@ pkgs:
     "m"                                  = []; # in stdenv
     "magic"                              = [ pkgs."file" ];
     "MagickWand"                         = [ pkgs."imagemagick" ];
+    "mcrypt"                             = [ pkgs."libmcrypt" ];
     "mnl"                                = [ pkgs."libmnl" ];
     "mpi"                                = [ pkgs."openmpi" ];
     "ncursesw"                           = [ pkgs."ncurses" ];
