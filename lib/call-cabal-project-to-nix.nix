@@ -222,9 +222,11 @@ let
                   then { rev = repoData.ref; }
                   else { inherit (repoData) ref; };
                 drv = builtins.fetchGit ({ inherit (repoData) url; } // refOrRev);
-              in __trace "WARNING: No sha256 found for source-repository-package ${repoData.url} ${repoData.ref} download may fail in restricted mode (hydra)"
-                (__trace "Consider adding `--sha256: ${hashPath drv}` to the ${cabalProjectFileName} file or passing in a sha256map argument"
-                 drv);
+                maybeTrace = x: if repoData.sha256 != null then x else
+                  __trace "WARNING: No sha256 found for source-repository-package ${repoData.url} ${repoData.ref} download may fail in restricted mode (hydra)"
+                  (__trace "Consider adding `--sha256: ${hashPath drv}` to the ${cabalProjectFileName} file or passing in a sha256map argument"
+                   x);
+              in maybeTrace drv;
         in {
           # Download the source-repository-package commit and add it to a minimal git
           # repository that `cabal` will be able to access from a non fixed output derivation.
