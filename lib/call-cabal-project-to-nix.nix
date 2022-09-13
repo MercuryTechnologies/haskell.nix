@@ -234,9 +234,7 @@ let
             }
             else
               let
-                # If the "tag" is a hash, we'll use 'rev', otherwise we'll use
-                # 'ref'. Using a commit hash as a 'ref' doesn't do what we want.
-                drv = builtins.fetchGit repoData;
+                drv = builtins.fetchGit { inherit (repoData) url sha256 rev ref; };
                 maybeTrace = x: if repoData.sha256 != null then x else
                   __trace "WARNING: No sha256 found for source-repository-package ${repoData.url} ${repoData.ref} download may fail in restricted mode (hydra)"
                   (__trace "Consider adding `--sha256: ${hashPath drv}` to the ${cabalProjectFileName} file or passing in a sha256map argument"
