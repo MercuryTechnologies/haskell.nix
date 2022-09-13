@@ -45,6 +45,7 @@ pkgs:
     "gstreamer-plugins-base-0.10"        = [ "gst-plugins-base" ];
     "gstreamer-video-1.0"                = [ "gst-plugins-base" ];
     "gtk-x11-2.0"                        = [ "gtk_x11" ];
+    "ical"                               = [ "libical" ];
     "icudata"                            = [ "icu" ];
     "icui18n"                            = [ "icu" ];
     "icuuc"                              = [ "icu" ];

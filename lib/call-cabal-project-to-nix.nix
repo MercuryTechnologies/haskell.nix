@@ -227,13 +227,18 @@ let
                 (if inputMap.${repoData.url}.rev != repoData.ref
                   then throw "${inputMap.${repoData.url}.rev} may not match ${repoData.ref} for ${repoData.url} use \"${repoData.url}/${repoData.ref}\" as the inputMap key if ${repoData.ref} is a branch or tag that points to ${inputMap.${repoData.url}.rev}."
                   else inputMap.${repoData.url})
-            else if repoData.sha256 != null
+            else if repoData.sha256 != null && !repoData.is-private
               then fetchgit repoData
             else
-              let drv = builtins.fetchGit { inherit (repoData) url ref; };
-              in __trace "WARNING: No sha256 found for source-repository-package ${repoData.url} ${repoData.ref} download may fail in restricted mode (hydra)"
-                (__trace "Consider adding `--sha256: ${hashPath drv}` to the ${cabalProjectFileName} file or passing in a sha256map argument"
-                 drv);
+              let
+                # If the "tag" is a hash, we'll use 'rev', otherwise we'll use
+                # 'ref'. Using a commit hash as a 'ref' doesn't do what we want.
+                drv = builtins.fetchGit repoData;
+                maybeTrace = x: if repoData.sha256 != null then x else
+                  __trace "WARNING: No sha256 found for source-repository-package ${repoData.url} ${repoData.ref} download may fail in restricted mode (hydra)"
+                  (__trace "Consider adding `--sha256: ${hashPath drv}` to the ${cabalProjectFileName} file or passing in a sha256map argument"
+                   x);
+              in maybeTrace drv;
         in {
           # Download the source-repository-package commit and add it to a minimal git
           # repository that `cabal` will be able to access from a non fixed output derivation.
