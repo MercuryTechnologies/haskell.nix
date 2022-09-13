@@ -234,7 +234,7 @@ let
             }
             else
               let
-                drv = builtins.fetchGit { inherit (repoData) url sha256 ; rev = repoData.rev or null; ref = repoData.ref or null; };
+                drv = builtins.fetchGit { inherit (repoData) url sha256 ; rev = repoData.rev or repoData.ref; ref = repoData.ref or null; };
                 maybeTrace = x: if repoData.sha256 != null then x else
                   __trace "WARNING: No sha256 found for source-repository-package ${repoData.url} ${repoData.ref} download may fail in restricted mode (hydra)"
                   (__trace "Consider adding `--sha256: ${hashPath drv}` to the ${cabalProjectFileName} file or passing in a sha256map argument"
