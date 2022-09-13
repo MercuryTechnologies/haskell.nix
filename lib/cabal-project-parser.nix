@@ -84,6 +84,8 @@ let
     subdirs = if repo ? subdir
       then pkgs.lib.filter (x: x != "") (pkgs.lib.splitString " " repo.subdir)
       else ["."];
+    # All repos served via ssh or git protocols are usually private
+    is-private = pkgs.lib.substring 0 4 repo.location != "http";
   };
 
   # Parse a source-repository-package and return data of `type: git` repositories
