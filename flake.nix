@@ -8,6 +8,7 @@
     nixpkgs-2111 = { url = "github:NixOS/nixpkgs/nixpkgs-21.11-darwin"; };
     nixpkgs-2205 = { url = "github:NixOS/nixpkgs/nixpkgs-22.05-darwin"; };
     nixpkgs-unstable = { url = "github:NixOS/nixpkgs/nixpkgs-unstable"; };
+    flake-compat = { url = "github:input-output-hk/flake-compat"; flake = false; };
     flake-utils = { url = "github:numtide/flake-utils"; };
     hydra.url = "hydra";
     hackage = {
@@ -137,7 +138,7 @@
 
       packages = ((self.internal.compat { inherit system; }).hix).apps;
 
-      devShell = with self.legacyPackages.${system};
+      devShells.default = with self.legacyPackages.${system};
         mkShell {
           buildInputs = [
             nixUnstable
@@ -147,4 +148,14 @@
           ];
         };
     });
+
+  # --- Flake Local Nix Configuration ----------------------------
+  nixConfig = {
+    # This sets the flake to use the IOG nix cache.
+    # Nix should ask for permission before using it,
+    # but remove it here if you do not want it to.
+    extra-substituters = ["https://cache.iog.io"];
+    extra-trusted-public-keys = ["hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ="];
+    allow-import-from-derivation = "true";
+  };
 }

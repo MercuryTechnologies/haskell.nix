@@ -78,9 +78,11 @@ let
     ++ lib.optionals packageSetupDeps (map (p: p.setup.config)
          (lib.filter (p: p.buildType != "Simple") selectedPackages));
 
-  name = if lib.length selectedPackages == 1
+  identifierName = if lib.length selectedPackages == 1
     then "ghc-shell-for-${(lib.head selectedPackages).identifier.name}"
     else "ghc-shell-for-packages";
+
+  name = if (mkDrvArgs.name or null) == null then identifierName else mkDrvArgs.name;
 
   # We need to remove any dependencies which would bring in selected components (see above).
   packageInputs = removeSelectedInputs (lib.concatMap (cfg: cfg.depends) selectedConfigs)
@@ -93,11 +95,14 @@ let
   #
   # Also, we take care to keep duplicates out of the list, otherwise we may see
   # "Argument list too long" errors from bash when entering a shell.
-  uniqueInputs = inputList: builtins.listToAttrs (builtins.map (x: lib.nameValuePair (x.name) x) inputList);
-  unionComponentInputs = inputsSoFar: c:
-    inputsSoFar // uniqueInputs c.buildInputs // uniqueInputs c.propagatedBuildInputs;
-  systemInputs' = lib.lists.foldl unionComponentInputs {} selectedComponents;
-  systemInputs = removeSelectedInputs (builtins.attrValues systemInputs');
+  #
+  # Version of `lib.unique` that should be fast if the name attributes are unique
+  uniqueWithName = list:
+    lib.concatMap lib.unique (
+      builtins.attrValues (
+        builtins.groupBy (x: if __typeOf x == "set" then x.name or "noname" else "notset") list));
+  allSystemInputs = lib.concatMap (c: c.buildInputs ++ c.propagatedBuildInputs) selectedComponents;
+  systemInputs = removeSelectedInputs (uniqueWithName allSystemInputs);
 
   nativeBuildInputs = removeSelectedInputs
     (lib.concatMap (c: c.executableToolDepends) selectedComponents);
@@ -111,14 +116,14 @@ let
     doExactConfig = false;
   };
   configFiles = makeConfigFiles {
-    fullName = args.name or name;
-    identifier.name = name;
+    fullName = name;
+    identifier.name = identifierName;
     inherit component enableDWARF;
     chooseDrv = p: if withHaddock && p ? haddock then p.haddock else p;
   };
   ghcEnv = ghcForComponent {
     inherit configFiles;
-    componentName = name;
+    componentName = identifierName;
     postInstall = lib.optionalString withHoogle' ''
       ln -s ${hoogleIndex}/bin/hoogle $out/bin
     '';
@@ -152,7 +157,7 @@ let
   mkDrvArgs = builtins.removeAttrs args ["packages" "components" "additional" "withHoogle" "tools"];
 in
   mkShell (mkDrvArgs // {
-    name = mkDrvArgs.name or name;
+    inherit name;
 
     buildInputs = systemInputs
       ++ mkDrvArgs.buildInputs or [];
