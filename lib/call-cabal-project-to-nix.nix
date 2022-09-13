@@ -228,7 +228,7 @@ let
                   then throw "${inputMap.${repoData.url}.rev} may not match ${repoData.ref} for ${repoData.url} use \"${repoData.url}/${repoData.ref}\" as the inputMap key if ${repoData.ref} is a branch or tag that points to ${inputMap.${repoData.url}.rev}."
                   else inputMap.${repoData.url})
             else if repoData.sha256 != null && !repoData.is-private
-              then fetchgit repoData
+            then fetchgit { inherit (repoData) url sha256 rev; }
             else
               let
                 # If the "tag" is a hash, we'll use 'rev', otherwise we'll use
