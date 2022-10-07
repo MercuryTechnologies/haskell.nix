@@ -46,10 +46,6 @@
       url = "github:sevanspowell/hpc-coveralls";
       flake = false;
     };
-    nix-tools = {
-      url = "github:input-output-hk/nix-tools";
-      flake = false;
-    };
     old-ghc-nix = {
       url = "github:angerman/old-ghc-nix/master";
       flake = false;
@@ -138,15 +134,31 @@
 
       packages = ((self.internal.compat { inherit system; }).hix).apps;
 
-      devShells.default = with self.legacyPackages.${system};
-        mkShell {
-          buildInputs = [
-            nixUnstable
-            cabal-install
-            haskell-nix.compiler.${compiler}
-            haskell-nix.nix-tools.${compiler}
-          ];
-        };
+      devShells = with self.legacyPackages.${system}; {
+        default =
+          mkShell {
+            buildInputs = [
+              nixUnstable
+              cabal-install
+              haskell-nix.compiler.${compiler}
+            ];
+          };
+      } // __mapAttrs (compiler-nix-name: compiler:
+          mkShell {
+            buildInputs = [
+              compiler
+              haskell-nix.cabal-install.${compiler-nix-name}
+            ];
+          }
+      ) (
+        # Exclude old versions of GHC to speed up `nix flake check`
+        builtins.removeAttrs haskell-nix.compiler
+          [ "ghc844"
+            "ghc861" "ghc862" "ghc863" "ghc864"
+            "ghc881" "ghc882" "ghc883"
+            "ghc8101" "ghc8102" "ghc8103" "ghc8104" "ghc8105" "ghc8106" "ghc810420210212"
+            "ghc901"
+            "ghc921" "ghc922" "ghc923"]);
     });
 
   # --- Flake Local Nix Configuration ----------------------------

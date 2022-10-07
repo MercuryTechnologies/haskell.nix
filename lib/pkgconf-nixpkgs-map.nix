@@ -52,7 +52,6 @@ pkgs:
     "idn"                                = [ "libidn" ];
     "Imlib2"                             = [ "imlib2" ];
     "iw"                                 = [ "wirelesstools" ];
-    "javascriptcoregtk-3.0"              = [ "webkitgtk24x-gtk3" ]; # These are the old APIs, of which 2.4 is the last provider, so map directly to that.
     "jpeg"                               = [ "libjpeg" ];
     "jvm"                                = [ "jdk" ];
     "liboath"                            = [ "liboauth" ];
@@ -84,7 +83,6 @@ pkgs:
     "systemd-journal"                    = [ "systemd" ];
     "tag_c"                              = [ "taglib" ];
     "webkit2gtk"                         = [ "webkitgtk" ];
-    "webkitgtk-3.0"                      = [ "webkitgtk24x-gtk3" ]; # These are the old APIs, of which 2.4 is the last provider, so map directly to that
     "xml2"                               = [ "libxml2" ];
     "yaml"                               = [ "libyaml" ];
     "z"                                  = [ "zlib" ];
@@ -4302,7 +4300,7 @@ pkgs:
 #    "python3-embed" = [ "pythonInterpreters" ];
 #    "python3" = [ "pythonInterpreters" ];
 #    "python" = [ "pythonInterpreters" ];
-    "qca2" = [ "qca2" ];
+#    "qca2" = [ "qca2" ];
     "qhullcpp" = [ "qhull" ];
     "qhull_r" = [ "qhull" ];
     "qhullstatic" = [ "qhull" ];
@@ -5584,7 +5582,7 @@ pkgs:
     "zzipfseeko" = [ "zziplib" ];
     "zziplib" = [ "zziplib" ];
     "zzipmmapped" = [ "zziplib" ];
-}) //
+} // pkgs.haskell-nix.extraPkgconfigMappings) //
   lookupAttrsIn pkgs.xorg {
     # Adding xlibsWrapper since it was used here beofre.
     # Putting libX11 first though so it can be used to get the version
