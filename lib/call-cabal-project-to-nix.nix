@@ -227,8 +227,11 @@ let
                 (if inputMap.${repoData.url}.rev != repoData.ref
                   then throw "${inputMap.${repoData.url}.rev} may not match ${repoData.ref} for ${repoData.url} use \"${repoData.url}/${repoData.ref}\" as the inputMap key if ${repoData.ref} is a branch or tag that points to ${inputMap.${repoData.url}.rev}."
                   else inputMap.${repoData.url})
-            else if repoData.sha256 != null
-            then fetchgit { inherit (repoData) url sha256; rev = repoData.rev or repoData.ref; }
+            else if repoData.sha256 != null && !repoData.is-private
+            then fetchgit { 
+              inherit (repoData) url sha256; 
+              rev = repoData.rev or repoData.ref;
+            }
             else
               let drv = builtins.fetchGit
                 { inherit (repoData) url ; ref = repoData.ref or null; }
